@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import '../SearchResults/search_results.dart';
 
 class SearchField extends StatefulWidget {
   const SearchField({Key? key}) : super(key: key);
@@ -12,23 +13,37 @@ class _SearchFieldState extends State<SearchField> {
   DateTime? _startDate;
   DateTime? _endDate;
 
+  Future<void> _openDatePicker(BuildContext context) async {
+    final DateTimeRange? picked = await showDateRangePicker(
+      context: context,
+      firstDate: DateTime(DateTime.now().year - 5),
+      lastDate: DateTime(DateTime.now().year + 5),
+    );
+    if (picked != null) {
+      setState(() {
+        _startDate = picked.start;
+        _endDate = picked.end;
+      });
+
+      // Navigate to SearchResultsPage with user input
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => SearchResultsPage(
+            startDate: _startDate!,
+            endDate: _endDate!,
+            origin: 'SFO-sky', // Replace with user's origin input
+            destination: 'JFK-sky', // Replace with user's destination input
+          ),
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () async {
-        final DateTimeRange? picked = await showDateRangePicker(
-          context: context,
-          firstDate: DateTime(DateTime.now().year - 5),
-          lastDate: DateTime(DateTime.now().year + 5),
-        );
-        if (picked != null) {
-          setState(() {
-            _startDate = picked.start;
-            _endDate = picked.end;
-          });
-        }
-        // Perform your search action here using _startDate and _endDate
-      },
+      onTap: () => _openDatePicker(context),
       child: Container(
         width: MediaQuery.of(context).size.width * 0.8,
         height: 50,
@@ -66,7 +81,10 @@ class _SearchFieldState extends State<SearchField> {
                   ),
                 ),
               ),
-              Icon(Icons.calendar_today),
+              GestureDetector(
+                onTap: () => _openDatePicker(context),
+                child: Icon(Icons.calendar_today),
+              ),
             ],
           ),
         ),
