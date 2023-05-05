@@ -34,8 +34,9 @@ dependencies:
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
+  #packages for the google oath authentication the required dependencies
   firebase_core: ^2.9.0
-  firebase_auth: ^4.0.0
+  firebase_auth: ^4.5.0
   google_sign_in: ^6.1.0
   # to allow us to use a svg file
   flutter_svg: ^2.0.5

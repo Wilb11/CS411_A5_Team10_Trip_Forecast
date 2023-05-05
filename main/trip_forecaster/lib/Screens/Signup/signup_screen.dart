@@ -96,6 +96,20 @@ class MobileSignupScreen extends StatelessWidget {
           ],
         ),
         const SocalSignUp()
+        // home: StreamBuilder<User?>(
+        //   stream: FirebaseAuth. instance.authStateChanges(),
+        //   builder: (BuildContext context, AsyncSnapshot snapshot){
+        //     if(snapshot.hasEnror){
+        //       return Text(snapshot.error.tostring());
+        //       }
+        //     if(snapshot.connectionState==ConnectionState.active){
+        //         if(snapshot.data==null){
+        //           return LoginPage()
+        //         }
+        //     }
+        //     return Center(child)
+        //   };
+                    
       ],
     );
   }
