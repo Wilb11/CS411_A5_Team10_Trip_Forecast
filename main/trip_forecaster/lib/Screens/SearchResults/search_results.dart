@@ -1,40 +1,59 @@
 import 'package:flutter/material.dart';
-import 'package:webview_flutter/webview_flutter.dart';
+import 'package:trip_forecaster/lib/flightApi.dart';
+import 'package:trip_forecaster/lib/weatherApi.dart';
 
-class SearchResultsPage extends StatefulWidget {
-  final String origin;
-  final String destination;
+class ResultsScreen extends StatefulWidget {
   final DateTime startDate;
   final DateTime endDate;
 
-  SearchResultsPage({
-    Key? key,
-    required this.origin,
-    required this.destination,
-    required this.startDate,
-    required this.endDate,
-  }) : super(key: key);
+  const ResultsScreen({Key? key, required this.startDate, required this.endDate}) : super(key: key);
 
   @override
-  _SearchResultsPageState createState() => _SearchResultsPageState();
+  _ResultsScreenState createState() => _ResultsScreenState();
 }
 
-class _SearchResultsPageState extends State<SearchResultsPage> {
+class _ResultsScreenState extends State<ResultsScreen> {
+  List<DestinationInfo> destinations = [];
+
+  @override
+  void initState() {
+    super.initState();
+    fetchResults();
+  }
+
+  void fetchResults() async {
+    final flightResults = await getFlightResults(widget.startDate, widget.endDate);
+    List<DestinationInfo> tempDestinations = [];
+
+    for (final flight in flightResults) {
+      final weatherInfo = await getWeatherInfo(flight.destination, widget.startDate, widget.endDate);
+      tempDestinations.add(DestinationInfo(
+        name: flight.destination,
+        flightInfo: flight.info,
+        weatherInfo: weatherInfo,
+      ));
+    }
+
+    setState(() {
+      destinations = tempDestinations;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    String formattedStartDate =
-        "${widget.startDate.year}-${widget.startDate.month.toString().padLeft(2, '0')}-${widget.startDate.day.toString().padLeft(2, '0')}";
-    String formattedEndDate =
-        "${widget.endDate.year}-${widget.endDate.month.toString().padLeft(2, '0')}-${widget.endDate.day.toString().padLeft(2, '0')}";
-
-    String url =
-        "https://www.kayak.com/flights/${widget.origin}-${widget.destination}/${formattedStartDate}/${formattedEndDate}?sort=bestflight_a";
-
     return Scaffold(
-      appBar: AppBar(title: Text('Search Results')),
-      body: WebView(
-        initialUrl: url,
-        javascriptMode: JavascriptMode.unrestricted,
+      appBar: AppBar(
+        title: Text('Results'),
+      ),
+      body: ListView.builder(
+        itemCount: destinations.length,
+        itemBuilder: (context, index) {
+          final destination = destinations[index];
+          return ListTile(
+            title: Text(destination.name),
+            subtitle: Text('Flight: ${destination.flightInfo}\nWeather: ${destination.weatherInfo}'),
+          );
+        },
       ),
     );
   }
